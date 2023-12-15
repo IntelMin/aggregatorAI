@@ -3,7 +3,7 @@ import axios from "axios";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { OPENAIURL } from "../../config/api";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import Loader from "@/components/Loader";
 
 interface Chat {
@@ -18,37 +18,35 @@ const TextAI = () => {
 
   const getContent = async () => {
     if (!searchQuery.trim()) return;
-  
+
     setLoading(true);
 
     const userQuery = { type: "question", content: searchQuery };
-    setChatHistory(prev => [...prev, userQuery]);
+    setChatHistory((prev) => [...prev, userQuery]);
 
     try {
       const data = {
         model: "gpt-3.5-turbo",
         messages: [{ role: "user", content: searchQuery }],
       };
-  
+
       const OPENAI_TOKEN = process.env.NEXT_PUBLIC_OPENAI_TOKEN;
 
       const headers = { Authorization: `Bearer ${OPENAI_TOKEN}` };
       const response = await axios.post(OPENAIURL, data, { headers });
-  
+
       if (response.data.choices && response.data.choices.length > 0) {
         const aiResponseContent = response.data.choices[0].message.content;
         const aiResponse = { type: "answer", content: aiResponseContent };
-  
-        const data = await supabase
-          .from('chat_activities')
-          .insert({
-            title: "User Query",
-            iconpath: "/path/to/user-icon.svg",
-            time: new Date().toISOString(),
-            description: searchQuery
-          });
 
-        setChatHistory(prev => [...prev, aiResponse]);
+        const data = await supabase.from("chat_activities").insert({
+          title: "User Query",
+          iconpath: "/path/to/user-icon.svg",
+          time: new Date().toISOString(),
+          description: searchQuery,
+        });
+
+        setChatHistory((prev) => [...prev, aiResponse]);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -82,7 +80,9 @@ const TextAI = () => {
         chatHistory.map((chat, key) => (
           <div
             key={key}
-            className={`ml-4 md:ml-16 ${key === chatHistory.length - 1 ? "pb-20" : ""}`}
+            className={`ml-4 md:ml-16 ${
+              key === chatHistory.length - 1 ? "pb-20" : ""
+            }`}
           >
             <div className="flex items-center">
               <Image
@@ -97,11 +97,11 @@ const TextAI = () => {
               </p>
             </div>
 
-            <p className="text-[16px] text-justify mb-4 pr-8 pl-8">{chat.content}</p>
+            <p className="text-[16px] text-justify mb-4 pr-8 pl-8">
+              {chat.content}
+            </p>
 
-            {loading && key === chatHistory.length - 1 && (
-              <Loader />
-            )}
+            {loading && key === chatHistory.length - 1 && <Loader />}
           </div>
         ))
       ) : (
@@ -128,17 +128,19 @@ const TextAI = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
           disabled={loading}
           onKeyPress={(e) => {
-            if (e.key === 'Enter' && !loading) {
+            if (e.key === "Enter" && !loading) {
               getContent();
             }
           }}
-        
         />
         <div className="inline-block float-right cursor-pointer">
           {loading ? (
             <button className="send-btn">Loading ...</button>
           ) : (
-            <button className="send-btn flex items-center p-[15px]" onClick={getContent}>
+            <button
+              className="send-btn flex items-center p-[15px]"
+              onClick={getContent}
+            >
               <svg
                 width="25"
                 height="24"
