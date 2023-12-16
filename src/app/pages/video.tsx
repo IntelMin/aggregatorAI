@@ -1,4 +1,3 @@
-
 import PremiumCard from "@/components/premium";
 import { supabase } from "@/lib/supabase";
 import React, { useCallback, useState } from "react";
@@ -21,36 +20,36 @@ const VideoAI = () => {
   const getContent = async () => {
     if (!searchQuery.trim()) return;
     setLoading(true);
-    
+
     const userQuery = { type: "question", content: searchQuery };
-    setVideoHistory(prev => [...prev, userQuery]);
+    setVideoHistory((prev) => [...prev, userQuery]);
 
     const data = {
-      "key": STABLEDDIFFUISION_TOKEN,
-      "prompt": searchQuery,
-      "negative_prompt": "",
-      "scheduler": "LCMScheduler",
-      "seconds": 2
-    }
+      key: STABLEDDIFFUISION_TOKEN,
+      prompt: searchQuery,
+      negative_prompt: "",
+      scheduler: "LCMScheduler",
+      seconds: 2,
+    };
 
     try {
       const videoKeyResponse = await axios.post(STABLEDIFFUSION_URL, data);
-      if(videoKeyResponse.data.status == 'processing'){
+      if (videoKeyResponse.data.status == "processing") {
         const fetchURL = videoKeyResponse.data.fetch_result;
         setTimeout(async () => {
           await getVideoFunc(fetchURL);
         }, 10000);
       }
-    } catch(err){
+    } catch (err) {
       console.log(err);
     }
-  }
+  };
 
   const getVideoFunc = async (url: string) => {
     try {
       const data = {
-        "key": STABLEDDIFFUISION_TOKEN
-      }
+        key: STABLEDDIFFUISION_TOKEN,
+      };
       const videoResponse = await axios.post(url, data);
 
       if (videoResponse.data.status === "processing") {
@@ -60,20 +59,21 @@ const VideoAI = () => {
       }
 
       if (videoResponse.data.status === "success") {
-        const { error } = await supabase
-          .from('chat_activities')
-          .insert({
-            title: "Video Inquiry",
-            iconpath: "/path/to/video-icon.svg",
-            time: new Date().toISOString(),
-            description: searchQuery
-          });
+        const { error } = await supabase.from("chat_activities").insert({
+          title: "Video Inquiry",
+          iconpath: "/path/to/video-icon.svg",
+          time: new Date().toISOString(),
+          description: searchQuery,
+        });
         console.log(error);
 
-        setVideoHistory(prev => [...prev, {
-          type: "answer",
-          content: videoResponse.data.output[0],
-        }]);
+        setVideoHistory((prev) => [
+          ...prev,
+          {
+            type: "answer",
+            content: videoResponse.data.output[0],
+          },
+        ]);
 
         setSearchQuery("");
         setLoading(false);
@@ -104,25 +104,26 @@ const VideoAI = () => {
               />
               {item.type == "question" ? "Me" : "Agai"}
             </div>
-            {
-              item.type == "question" ? 
-                (
-                  <p className="text-[16px] text-justify pr-8  mb-4 pl-8">
-                    {item.content}
-                  </p>
-                ) 
-                : 
-                (
-                  <video className="pl-8" id="myVideo" width="640" height="360" controls>
-                    <source src={item.content} type="video/mp4" />
-                  </video>
-                )
-            }
-          {loading && key === videoHistory.length - 1 && 
-            <>
-              <ProgressBar  time={120}/>
-            </>
-            }
+            {item.type == "question" ? (
+              <p className="text-[16px] text-justify pr-8  mb-4 pl-8">
+                {item.content}
+              </p>
+            ) : (
+              <video
+                className="pl-8"
+                id="myVideo"
+                width="640"
+                height="360"
+                controls
+              >
+                <source src={item.content} type="video/mp4" />
+              </video>
+            )}
+            {loading && key === videoHistory.length - 1 && (
+              <>
+                <ProgressBar time={120} />
+              </>
+            )}
           </div>
         ))
       ) : (

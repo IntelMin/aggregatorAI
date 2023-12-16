@@ -1,4 +1,3 @@
-
 import PremiumCard from "@/components/premium";
 import { supabase } from "@/lib/supabase";
 import React, { useCallback, useState } from "react";
@@ -21,46 +20,48 @@ const ThreeDImageAI = () => {
   const getContent = async () => {
     if (!searchQuery.trim()) return;
     setLoading(true);
-    
+
     const userQuery = { type: "question", content: searchQuery };
-    setThreeDImageHistory(prev => [...prev, userQuery]);
+    setThreeDImageHistory((prev) => [...prev, userQuery]);
 
     const data = {
-      "key": STABLEDDIFFUISION_TOKEN,
-      "prompt":searchQuery,
-      "guidance_scale":20,
-      "steps":30,
-      "frame_size":256,
-      "output_type":"gif",
-      "webhook": null,
-      "track_id": null
-    }
+      key: STABLEDDIFFUISION_TOKEN,
+      prompt: searchQuery,
+      guidance_scale: 20,
+      steps: 30,
+      frame_size: 256,
+      output_type: "gif",
+      webhook: null,
+      track_id: null,
+    };
 
     try {
-      const ThreeDImageKeyResponse = await axios.post(STABLEDIFFUSIONTHREE_URL, data);
-      if(ThreeDImageKeyResponse.data.status == 'processing'){
+      const ThreeDImageKeyResponse = await axios.post(
+        STABLEDIFFUSIONTHREE_URL,
+        data
+      );
+      if (ThreeDImageKeyResponse.data.status == "processing") {
         const fetchURL = ThreeDImageKeyResponse.data.fetch_result;
         setTimeout(async () => {
           await getThreeDImageFunc(fetchURL);
         }, 10000);
       }
-    } catch(err){
+    } catch (err) {
       console.log(err);
     }
-  }
+  };
 
   const getThreeDImageFunc = async (url: string) => {
     try {
       const data = {
-        "key": STABLEDDIFFUISION_TOKEN
-      }
+        key: STABLEDDIFFUISION_TOKEN,
+      };
       const ThreeDImageResponse = await axios.post(url, data);
 
       if (ThreeDImageResponse.data.status === "processing") {
         setTimeout(async () => {
           await getThreeDImageFunc(url);
         }, 10000);
-
       }
 
       if (ThreeDImageResponse.data.status === "success") {
@@ -74,10 +75,13 @@ const ThreeDImageAI = () => {
           });
         console.log(error);
 
-        setThreeDImageHistory(prev => [...prev, {
-          type: "answer",
-          content: ThreeDImageResponse.data.output[0],
-        }]);
+        setThreeDImageHistory((prev) => [
+          ...prev,
+          {
+            type: "answer",
+            content: ThreeDImageResponse.data.output[0],
+          },
+        ]);
 
         setSearchQuery("");
         setLoading(false);
@@ -108,29 +112,24 @@ const ThreeDImageAI = () => {
               />
               {item.type == "question" ? "Me" : "Agai"}
             </div>
-            {
-              item.type == "question" ? 
-                (
-                  <p className="text-[16px] text-justify pr-8  mb-4 pl-8">
-                    {item.content}
-                  </p>
-                ) 
-                : 
-                (
-                  <Image
-                    className="m-auto mt-4"
-                    src={item.content}
-                    height={300}
-                    width={300}
-                    alt=""
-                  />
-                )
-            }
-          {loading && key === ThreeDImageHistory.length - 1 && 
-            <>
-              <ProgressBar  time={120}/>
-            </>
-            }
+            {item.type == "question" ? (
+              <p className="text-[16px] text-justify pr-8  mb-4 pl-8">
+                {item.content}
+              </p>
+            ) : (
+              <Image
+                className="m-auto mt-4"
+                src={item.content}
+                height={300}
+                width={300}
+                alt=""
+              />
+            )}
+            {loading && key === ThreeDImageHistory.length - 1 && (
+              <>
+                <ProgressBar time={120} />
+              </>
+            )}
           </div>
         ))
       ) : (
