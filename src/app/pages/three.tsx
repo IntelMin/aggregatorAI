@@ -74,6 +74,7 @@ const ThreeDImageAI = () => {
             description: searchQuery
           });
         console.log(error);
+        console.log(ThreeDImageResponse.data.output[0]);
 
         setThreeDImageHistory((prev) => [
           ...prev,
@@ -103,6 +104,7 @@ const ThreeDImageAI = () => {
             }`}
           >
             <div className="flex items-center">
+              
               <Image
                 className="text-left mb-4 mt-4 pr-4"
                 src={item.type == "question" ? "/me.png" : "/agai.png"}
