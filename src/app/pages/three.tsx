@@ -65,14 +65,12 @@ const ThreeDImageAI = () => {
       }
 
       if (ThreeDImageResponse.data.status === "success") {
-        const { error } = await supabase
-          .from('chat_activities')
-          .insert({
-            title: "ThreeDImage Inquiry",
-            iconpath: "/path/to/three-icon.svg",
-            time: new Date().toISOString(),
-            description: searchQuery
-          });
+        const { error } = await supabase.from("chat_activities").insert({
+          title: "ThreeDImage Inquiry",
+          iconpath: "/path/to/three-icon.svg",
+          time: new Date().toISOString(),
+          description: searchQuery,
+        });
         console.log(error);
 
         setThreeDImageHistory((prev) => [
@@ -103,7 +101,6 @@ const ThreeDImageAI = () => {
             }`}
           >
             <div className="flex items-center">
-              
               <Image
                 className="text-left mb-4 mt-4 pr-4"
                 src={item.type == "question" ? "/me.png" : "/agai.png"}
@@ -118,16 +115,13 @@ const ThreeDImageAI = () => {
                 {item.content}
               </p>
             ) : (
-              <>
-              <Image
+              <img
                 className="m-auto mt-4"
                 src={item.content}
                 height={300}
                 width={300}
                 alt=""
               />
-              this is my item {item.content}
-              </>
             )}
             {loading && key === ThreeDImageHistory.length - 1 && (
               <>
