@@ -74,7 +74,6 @@ const ThreeDImageAI = () => {
             description: searchQuery
           });
         console.log(error);
-        console.log(ThreeDImageResponse.data.output[0]);
 
         setThreeDImageHistory((prev) => [
           ...prev,
@@ -119,6 +118,7 @@ const ThreeDImageAI = () => {
                 {item.content}
               </p>
             ) : (
+              <>
               <Image
                 className="m-auto mt-4"
                 src={item.content}
@@ -126,6 +126,8 @@ const ThreeDImageAI = () => {
                 width={300}
                 alt=""
               />
+              this is my item {item.content}
+              </>
             )}
             {loading && key === ThreeDImageHistory.length - 1 && (
               <>
