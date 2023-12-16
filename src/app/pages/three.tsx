@@ -2,10 +2,12 @@ import PremiumCard from "@/components/premium";
 import { supabase } from "@/lib/supabase";
 import React, { useCallback, useState } from "react";
 import axios from "axios";
-import Image from "next/image";
+import Image, { ImageLoader, ImageLoaderProps } from "next/image";
+
 import { STABLEDIFFUSIONTHREE_URL } from "../../config/api";
 import { toast } from "react-toastify";
 import ProgressBar from "@/components/progress";
+
 interface Chat {
   type: string;
   content: string;
@@ -92,6 +94,10 @@ const ThreeDImageAI = () => {
     }
   };
 
+  const contentfulImageLoader: ImageLoader = ({ src, width }: ImageLoaderProps) => {
+    return `${src}?w=${width}`
+  }
+
   return (
     <div className="w-full pt-4">
       {ThreeDImageHistory.length > 0 ? (
@@ -118,6 +124,7 @@ const ThreeDImageAI = () => {
               </p>
             ) : (
               <Image
+                loader={contentfulImageLoader}
                 className="m-auto mt-4"
                 src={item.content}
                 height={300}
