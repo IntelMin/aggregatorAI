@@ -1,4 +1,3 @@
-
 import { supabase } from "@/lib/supabase";
 import React, { useState } from "react";
 import axios from "axios";
@@ -19,93 +18,94 @@ const ImageAI = () => {
   const getContent = async () => {
     if (!searchQuery.trim()) return;
     setLoading(true);
-    
+
     const userQuery = { type: "question", content: searchQuery };
-    setImageHistory(prev => [...prev, userQuery]);
+    setImageHistory((prev) => [...prev, userQuery]);
 
     const data = {
-      "key": STABLEDDIFFUISION_TOKEN,
-      "prompt":searchQuery,
-      "negative_prompt": null,
-      "width": "512",
-      "height": "512",
-      "samples": "1",
-      "num_inference_steps": "20",
-      "safety_checker": "no",
-      "enhance_prompt": "yes",
-      "seed": null,
-      "guidance_scale": 7.5,
-      "multi_lingual": "no",
-      "panorama": "no",
-      "self_attention": "no",
-      "upscale": "no",
-      "embeddings_model": null,
-      "webhook": null,
-      "track_id": null
-    }
+      key: STABLEDDIFFUISION_TOKEN,
+      prompt: searchQuery,
+      negative_prompt: null,
+      width: "512",
+      height: "512",
+      samples: "1",
+      num_inference_steps: "20",
+      safety_checker: "no",
+      enhance_prompt: "yes",
+      seed: null,
+      guidance_scale: 7.5,
+      multi_lingual: "no",
+      panorama: "no",
+      self_attention: "no",
+      upscale: "no",
+      embeddings_model: null,
+      webhook: null,
+      track_id: null,
+    };
 
     try {
       const imageKeyResponse = await axios.post(STABLEDIFFUSIONIMAGE_URL, data);
-      if(imageKeyResponse.data.status == 'processing'){
+      if (imageKeyResponse.data.status == "processing") {
         const fetchURL = imageKeyResponse.data.fetch_result;
         setTimeout(async () => {
           await getImageFunc(fetchURL);
         }, 10000);
       }
-      if(imageKeyResponse.data.status == "success"){
-        const { error } = await supabase
-          .from('chat_activities')
-          .insert({
-            title: "Image Inquiry",
-            iconpath: "/path/to/three-icon.svg",
-            time: new Date().toISOString(),
-            description: searchQuery
-          });
+      if (imageKeyResponse.data.status == "success") {
+        const { error } = await supabase.from("chat_activities").insert({
+          title: "Image Inquiry",
+          iconpath: "/path/to/three-icon.svg",
+          time: new Date().toISOString(),
+          description: searchQuery,
+        });
         console.log(error);
 
-        setImageHistory(prev => [...prev, {
-          type: "answer",
-          content: imageKeyResponse.data.output[0],
-        }]);
+        setImageHistory((prev) => [
+          ...prev,
+          {
+            type: "answer",
+            content: imageKeyResponse.data.output[0],
+          },
+        ]);
 
         setSearchQuery("");
         setLoading(false);
       }
-    } catch(err){
+    } catch (err) {
       console.log(err);
     }
-  }
+  };
 
   const getImageFunc = async (url: string) => {
     try {
       const data = {
-        "key": STABLEDDIFFUISION_TOKEN
-      }
+        key: STABLEDDIFFUISION_TOKEN,
+      };
       const ImageResponse = await axios.post(url, data);
-      console.log(ImageResponse)
+      console.log(ImageResponse);
       if (ImageResponse.data.status === "processing") {
         setTimeout(async () => {
           await getImageFunc(url);
         }, 10000);
-
       }
 
       if (ImageResponse.data.status === "success") {
         console.log("1111");
-        const { error } = await supabase
-          .from('chat_activities')
-          .insert({
-            title: "Image Inquiry",
-            iconpath: "/path/to/three-icon.svg",
-            time: new Date().toISOString(),
-            description: searchQuery
-          });
+        const { error } = await supabase.from("chat_activities").insert({
+          title: "Image Inquiry",
+          iconpath: "/path/to/three-icon.svg",
+          time: new Date().toISOString(),
+          description: searchQuery,
+        });
         console.log(error);
 
-        setImageHistory(prev => [...prev, {
-          type: "answer",
-          content: ImageResponse.data.output[0],
-        }]);
+        setImageHistory((prev) => [
+          ...prev,
+          {
+            type: "answer",
+            content: ImageResponse.data.output[0],
+          },
+        ]);
 
         setSearchQuery("");
         setLoading(false);
@@ -136,29 +136,24 @@ const ImageAI = () => {
               />
               {item.type == "question" ? "Me" : "Agai"}
             </div>
-            {
-              item.type == "question" ? 
-                (
-                  <p className="text-[16px] text-justify pr-8  mb-4 pl-8">
-                    {item.content}
-                  </p>
-                ) 
-                : 
-                (
-                  <Image
-                    className="m-auto mt-4"
-                    src={item.content}
-                    height={300}
-                    width={300}
-                    alt=""
-                  />
-                )
-            }
-          {loading && key === ImageHistory.length - 1 && 
-            <>
-              <ProgressBar  time={12}/>
-            </>
-            }
+            {item.type == "question" ? (
+              <p className="text-[16px] text-justify pr-8  mb-4 pl-8">
+                {item.content}
+              </p>
+            ) : (
+              <Image
+                className="m-auto mt-4"
+                src={item.content}
+                height={300}
+                width={300}
+                alt=""
+              />
+            )}
+            {loading && key === ImageHistory.length - 1 && (
+              <>
+                <ProgressBar time={12} />
+              </>
+            )}
           </div>
         ))
       ) : (

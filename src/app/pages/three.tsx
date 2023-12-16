@@ -67,14 +67,12 @@ const ThreeDImageAI = () => {
       }
 
       if (ThreeDImageResponse.data.status === "success") {
-        const { error } = await supabase
-          .from('chat_activities')
-          .insert({
-            title: "ThreeDImage Inquiry",
-            iconpath: "/path/to/three-icon.svg",
-            time: new Date().toISOString(),
-            description: searchQuery
-          });
+        const { error } = await supabase.from("chat_activities").insert({
+          title: "ThreeDImage Inquiry",
+          iconpath: "/path/to/three-icon.svg",
+          time: new Date().toISOString(),
+          description: searchQuery,
+        });
         console.log(error);
 
         setThreeDImageHistory((prev) => [
