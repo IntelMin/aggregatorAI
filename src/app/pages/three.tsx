@@ -64,7 +64,6 @@ const ThreeDImageAI = () => {
       }
 
       if (ThreeDImageResponse.data.status === "success") {
-        console.log("1111");
         const { error } = await supabase
           .from('chat_activities')
           .insert({
